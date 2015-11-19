@@ -745,10 +745,10 @@ function eat()
             return 1
         fi
         adb start-server # Prevent unexpected starting server message from adb get-state in the next line
-        if [ $(adb get-state) != device -a $(adb shell busybox test -e /sbin/recovery 2> /dev/null; echo $?) != 0 ] ; then
+        if [ $(adb get-state) != device -a $(adb shell test -e /sbin/recovery 2> /dev/null; echo $?) != 0 ] ; then
             echo "No device is online. Waiting for one..."
             echo "Please connect USB and/or enable USB debugging"
-            until [ $(adb get-state) = device -o $(adb shell busybox test -e /sbin/recovery 2> /dev/null; echo $?) = 0 ];do
+            until [ $(adb get-state) = device -o $(adb shell test -e /sbin/recovery 2> /dev/null; echo $?) = 0 ];do
                 sleep 1
             done
             echo "Device Found.."
@@ -760,7 +760,7 @@ function eat()
         sleep 1
         adb wait-for-device
         cat << EOF > /tmp/command
---sideload
+--sideload_auto_reboot
 EOF
         if adb push /tmp/command /cache/recovery/ ; then
             echo "Rebooting into recovery for sideload installation"
@@ -2178,10 +2178,10 @@ function dopush()
     shift
 
     adb start-server # Prevent unexpected starting server message from adb get-state in the next line
-    if [ $(adb get-state) != device -a $(adb shell busybox test -e /sbin/recovery 2> /dev/null; echo $?) != 0 ] ; then
+    if [ $(adb get-state) != device -a $(adb shell test -e /sbin/recovery 2> /dev/null; echo $?) != 0 ] ; then
         echo "No device is online. Waiting for one..."
         echo "Please connect USB and/or enable USB debugging"
-        until [ $(adb get-state) = device -o $(adb shell busybox test -e /sbin/recovery 2> /dev/null; echo $?) = 0 ];do
+        until [ $(adb get-state) = device -o $(adb shell test -e /sbin/recovery 2> /dev/null; echo $?) = 0 ];do
             sleep 1
         done
         echo "Device Found."
