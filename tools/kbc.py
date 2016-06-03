@@ -86,9 +86,9 @@ if not depsonly:
 local_manifests = r'.repo/local_manifests'
 if not os.path.exists(local_manifests): os.makedirs(local_manifests)
 
-def exists_in_tree(lm, repository):
+def exists_in_tree(lm, path):
     for child in lm.getchildren():
-        if child.attrib['name'].endswith(repository):
+        if child.attrib['path'] == path:
             return True
     return False
 
@@ -138,7 +138,7 @@ def get_from_manifest(devicename):
 
     return None
 
-def is_in_manifest(projectname):
+def is_in_manifest(projectpath):
     try:
         lm = ElementTree.parse(".repo/local_manifests/kbc.xml")
         lm = lm.getroot()
@@ -146,8 +146,8 @@ def is_in_manifest(projectname):
         lm = ElementTree.Element("manifest")
 
     for localpath in lm.findall("project"):
-        if localpath.get("name") == projectname:
-            return 1
+        if localpath.get("path") == projectpath:
+            return True
 
     ## Search in main manifest, too
     try:
@@ -157,10 +157,10 @@ def is_in_manifest(projectname):
         lm = ElementTree.Element("manifest")
 
     for localpath in lm.findall("project"):
-        if localpath.get("name") == projectname:
-            return 1
+        if localpath.get("path") == projectpath:
+            return True
 
-    return None
+    return False
 
 def add_to_manifest(repositories, fallback_branch = None):
     try:
@@ -177,8 +177,8 @@ def add_to_manifest(repositories, fallback_branch = None):
         else:
             repo_account = 'kbc-developers'
 
-        if exists_in_tree(lm, repo_name):
-            print(repo_account + '/%s already exists' % (repo_name))
+        if exists_in_tree(lm, repo_target):
+            print(repo_account + '/%s already fetched to %s' % (repo_name, repo_target))
             continue
 
         print('Adding dependency: ' + repo_account + '/%s -> %s' % (repo_name, repo_target))
@@ -233,7 +233,7 @@ def fetch_dependencies(repo_path, fallback_branch = None):
 
     if len(syncable_repos) > 0:
         print('Syncing dependencies')
-        os.system('repo sync %s' % ' '.join(syncable_repos))
+        os.system('repo sync --force-sync %s' % ' '.join(syncable_repos))
 
     for deprepo in syncable_repos:
         fetch_dependencies(deprepo)
@@ -295,7 +295,7 @@ else:
             add_to_manifest([adding], fallback_branch)
 
             print("Syncing repository to retrieve project.")
-            os.system('repo sync %s' % repo_path)
+            os.system('repo sync --force-sync %s' % repo_path)
             print("Repository synced!")
 
             fetch_dependencies(repo_path, fallback_branch)
