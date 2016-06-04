@@ -1034,6 +1034,17 @@ $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTIMG) $(recovery_ramdisk) $(recovery_k
 		$(RECOVERYIMAGE_EXTRA_DEPS)
 	@echo -e ${CL_CYN}"----- Making recovery image ------"${CL_RST}
 	$(call build-recoveryimage-target, $@)
+ifdef FLASHABLE_RECOVERYIMAGE_TARGET
+	@echo "Made SEANDROIDENFORCE image: $@ -------"
+ifdef TARGET_NEEDS_SEANDROIDENFORCE	
+	$(hide) echo -n "SEANDROIDENFORCE" >> $(INSTALLED_RECOVERYIMAGE_TARGET)
+endif
+	@echo -e ${CL_CYN}"----- Making odin3 recovery tar.md5 ------"${CL_RST}
+	$(hide) tar -C $(PRODUCT_OUT) -H ustar -c recovery.img > $(FLASHABLE_RECOVERYIMAGE_TARGET)-odin.tar
+	$(hide) md5sum -t $(FLASHABLE_RECOVERYIMAGE_TARGET)-odin.tar >> $(FLASHABLE_RECOVERYIMAGE_TARGET)-odin.tar
+	$(hide) mv $(FLASHABLE_RECOVERYIMAGE_TARGET)-odin.tar $(PRODUCT_OUT)/$(FLASHABLE_RECOVERYIMAGE_TARGET)-odin.tar.md5
+	@echo -e ${CL_CYN}"Made odin3 flashable image: $(PRODUCT_OUT)/$(FLASHABLE_RECOVERYIMAGE_TARGET)-odin.tar.md5"${CL_RST}
+endif	
 endif # BOARD_CUSTOM_BOOTIMG_MK
 
 # The system partition needs room for the recovery image as well.  We
