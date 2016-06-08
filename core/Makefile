@@ -1024,10 +1024,17 @@ $(recovery_uncompressed_ramdisk): $(MKBOOTFS) \
 	@echo -e ${CL_CYN}"----- Making uncompressed recovery ramdisk ------"${CL_RST}
 	$(hide) $(MKBOOTFS) $(TARGET_RECOVERY_ROOT_OUT) > $@
 
+ifndef BOARD_RAMDISK_LZMA
 $(recovery_ramdisk): $(MINIGZIP) \
 		$(recovery_uncompressed_ramdisk)
 	@echo -e ${CL_CYN}"----- Making compressed recovery ramdisk ------"${CL_RST}
 	$(hide) $(MINIGZIP) < $(recovery_uncompressed_ramdisk) > $@
+else
+$(recovery_ramdisk): \
+		$(recovery_uncompressed_ramdisk)
+	@echo -e ${CL_CYN}"----- Making compressed recovery ramdisk ------"${CL_RST}
+	$(hide) lzma < $(recovery_uncompressed_ramdisk) > $@
+endif
 
 ifndef BOARD_CUSTOM_BOOTIMG_MK
 $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTIMG) $(recovery_ramdisk) $(recovery_kernel) \
