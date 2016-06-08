@@ -204,7 +204,7 @@ def add_to_manifest(repositories, fallback_branch = None):
     f.close()
 
 def fetch_dependencies(repo_path, fallback_branch = None):
-    print('Looking for dependencies')
+    print("Looking for dependencies: %s" % repo_path)
     dependencies_path = repo_path + '/cm.dependencies'
     syncable_repos = []
 
